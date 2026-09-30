@@ -83,27 +83,49 @@
       }
 
       .inventory-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
         margin-bottom: 8px;
       }
 
       .inventory-slot {
-        position: relative;
-        min-height: 72px;
-        padding: 4px 6px 22px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 28px;
+        padding: 2px 6px;
         border: 1px solid var(--secondary-color);
         border-radius: 6px;
         background-color: rgba(0, 0, 0, 0.05);
-        font-size: 13px;
+        font-size: 14px;
         line-height: 1.2;
 
         .slot-label {
+          flex: 0 0 64px;
           font-size: 10px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
           opacity: 0.6;
+        }
+
+        .slot-name {
+          flex: 1 1 auto;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .slot-stats {
+          flex: 0 0 auto;
+          white-space: nowrap;
+        }
+
+        .slot-actions {
+          flex: 0 0 auto;
+          display: flex;
+          gap: 6px;
         }
 
         &.empty {
@@ -118,18 +140,6 @@
 
         &.empty.over {
           background-color: rgba(190, 30, 30, 0.2);
-        }
-
-        .slot-stats {
-          margin-top: 2px;
-        }
-
-        .slot-actions {
-          position: absolute;
-          right: 4px;
-          bottom: 3px;
-          display: flex;
-          gap: 6px;
         }
 
         i.fas {
