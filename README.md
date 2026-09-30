@@ -1,3 +1,14 @@
+# MB Ultra
+
+A fork of [maqloner's Mythic Bastionland system](https://github.com/maqloner/mythic-bastionland-fvtt) for Foundry VTT v13. It uses the system id `mbultra`, so it installs alongside the original.
+
+**Changes:** Coinage field on Knight and Squire sheets.
+
+**Install:** in Foundry, Game Systems > Install System, and paste this Manifest URL:
+`https://github.com/simondremel/mb-ultra/releases/latest/download/system.json`
+
+---
+
 # Mythic Bastionland for Foundry VTT
 
 ![Latest Release Download Count](https://img.shields.io/github/downloads/maqloner/mythic-bastionland/latest/system.zip) ![Total Download Count](https://img.shields.io/github/downloads/maqloner/mythic-bastionland/system.zip)

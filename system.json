@@ -7,7 +7,9 @@
     "minimum": "13",
     "verified": "13.348"
   },
-  "url": "https://github.com/maqloner/mythic-bastionland-fvtt",
+  "url": "https://github.com/simondremel/mb-ultra",
+  "manifest": "https://github.com/simondremel/mb-ultra/releases/latest/download/system.json",
+  "download": "https://github.com/simondremel/mb-ultra/releases/download/1.0.8-ultra.1/system.zip",
   "authors": [
     {
       "name": "Loner",
