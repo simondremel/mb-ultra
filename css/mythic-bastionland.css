@@ -801,6 +801,13 @@
   border-style: dashed;
   background-color: transparent;
 }
+.mythic-bastionland.sheet .inventory .inventory-slot.blocked {
+  background-color: rgba(0, 0, 0, 0.08);
+  border-style: dashed;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot.blocked .slot-name {
+  color: #8a8a8a;
+}
 .mythic-bastionland.sheet .inventory .inventory-slot.over {
   background-color: rgba(190, 30, 30, 0.35);
   border-color: #8a1c1c;

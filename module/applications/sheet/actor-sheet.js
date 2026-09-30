@@ -102,7 +102,10 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     const bodySlots = (types, size) => {
       const { placed, overflow } = MBActorSheet.#placeEquipped(properties.filter((item) => item.system.equipped && types.includes(item.type)), size);
-      return [...placed.map((item) => ({ item, over: false })), ...overflow.map((item) => ({ item, over: true }))];
+      return [
+        ...placed.map((cell) => (cell?.blocked ? { item: null, blocker: cell.blocked, over: false } : { item: cell, over: false })),
+        ...overflow.map((item) => ({ item, over: true }))
+      ];
     };
 
     const equipped = properties.filter((item) => item.system.equipped && item.system.isEquippable);
@@ -114,8 +117,31 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   /**
+   * Number of body slots an item occupies: long weapons need both hands.
+   * @param {Object} item
+   * @returns {Number}
+   */
+  static #slotWidth(item) {
+    return item.type === config.itemTypes.weapon && item.system.long ? 2 : 1;
+  }
+
+  /**
+   * Finds the first index where `width` consecutive slots are free.
+   * @param {(Object|null)[]} placed
+   * @param {Number} width
+   * @returns {Number} -1 when there is no room
+   */
+  static #findFreeSlot(placed, width) {
+    for (let index = 0; index + width <= placed.length; index++) {
+      if (placed.slice(index, index + width).every((cell) => cell === null)) return index;
+    }
+    return -1;
+  }
+
+  /**
    * Places equipped items in their remembered body slot (system.slot, 1-based).
    * Items without a valid, unclaimed slot take the first free one, or overflow.
+   * Extra slots taken by a wide item hold a `{ blocked: item }` marker.
    * @param {Object[]} items equipped items of one slot group
    * @param {Number} size
    * @returns {{placed: (Object|null)[], overflow: Object[]}}
@@ -123,15 +149,22 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
   static #placeEquipped(items, size) {
     const placed = new Array(size).fill(null);
     const loose = [];
-    for (const item of items) {
+    const put = (item, index) => {
+      placed[index] = item;
+      for (let extra = 1; extra < MBActorSheet.#slotWidth(item); extra++) placed[index + extra] = { blocked: item };
+    };
+
+    const widestFirst = [...items].sort((a, b) => MBActorSheet.#slotWidth(b) - MBActorSheet.#slotWidth(a));
+    for (const item of widestFirst) {
       const index = (item.system.slot ?? 0) - 1;
-      if (index >= 0 && index < size && !placed[index]) placed[index] = item;
+      const width = MBActorSheet.#slotWidth(item);
+      if (index >= 0 && index + width <= size && placed.slice(index, index + width).every((cell) => cell === null)) put(item, index);
       else loose.push(item);
     }
     const overflow = [];
     for (const item of loose) {
-      const free = placed.indexOf(null);
-      if (free >= 0) placed[free] = item;
+      const free = MBActorSheet.#findFreeSlot(placed, MBActorSheet.#slotWidth(item));
+      if (free >= 0) put(item, free);
       else overflow.push(item);
     }
     return { placed, overflow };
@@ -325,16 +358,19 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Remember the current slot of every equipped item so nothing shifts when this one changes.
     const updates = placed
-      .map((placedItem, index) => (placedItem && placedItem.system.slot !== index + 1 && placedItem !== item
+      .map((placedItem, index) => (placedItem && !placedItem.blocked && placedItem.system.slot !== index + 1 && placedItem !== item
         ? { _id: placedItem.id, "system.slot": index + 1 } : null))
       .filter(Boolean);
 
     if (item.system.equipped) {
       updates.push({ _id: item.id, "system.equipped": false, "system.slot": 0 });
     } else {
-      const free = placed.indexOf(null);
+      const free = MBActorSheet.#findFreeSlot(placed, MBActorSheet.#slotWidth(item));
       if (free < 0) {
-        ui.notifications.warn(game.i18n.format("MB.Inventory.SlotsFull", { slot: game.i18n.localize(isHand ? "MB.Inventory.Hand" : "MB.Inventory.Upper") }));
+        const message = MBActorSheet.#slotWidth(item) > 1
+          ? game.i18n.format("MB.Inventory.NeedsBothHands", { name: item.name })
+          : game.i18n.format("MB.Inventory.SlotsFull", { slot: game.i18n.localize(isHand ? "MB.Inventory.Hand" : "MB.Inventory.Upper") });
+        ui.notifications.warn(message);
         return;
       }
       updates.push({ _id: item.id, "system.equipped": true, "system.slot": free + 1 });

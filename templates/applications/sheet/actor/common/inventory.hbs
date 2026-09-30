@@ -4,17 +4,17 @@
   <h3 class="inventory-heading">{{localize "MB.Inventory.Body"}}</h3>
   <div class="inventory-grid">
     {{#each inventory.hand as |slot|}}
-      {{> inventory-slot item=slot.item over=slot.over label=(localize "MB.Inventory.Hand")}}
+      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over label=(localize "MB.Inventory.Hand")}}
     {{/each}}
     {{#each inventory.upper as |slot|}}
-      {{> inventory-slot item=slot.item over=slot.over label=(localize "MB.Inventory.Upper")}}
+      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over label=(localize "MB.Inventory.Upper")}}
     {{/each}}
   </div>
 
   <h3 class="inventory-heading">{{localize "MB.Inventory.Backpack"}}</h3>
   <div class="inventory-grid">
     {{#each inventory.backpack as |slot|}}
-      {{> inventory-slot item=slot.item over=slot.over label=(localize "MB.Inventory.Backpack")}}
+      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over label=(localize "MB.Inventory.Backpack")}}
     {{/each}}
   </div>
 </div>
@@ -52,6 +52,11 @@
           <a class="item-action item-delete" title="{{localize "MB.Item.Delete"}}"><i class="fas fa-trash"></i></a>
         </div>
       </div>
+  {{else if blocker}}
+    <div class="inventory-slot blocked">
+      <div class="slot-label">{{label}}</div>
+      <div class="slot-name text-bold">{{blocker.name}}</div>
+    </div>
   {{else}}
     <div class="inventory-slot empty">
       <div class="slot-label">{{label}}</div>
