@@ -112,32 +112,37 @@
       "long": false,
       "slow": false,
       "equipped": false,
-      "slot": 0
+      "slot": 0,
+      "backpackSlot": 0
     },
     "coat": {
       "description": "",
       "armor": 1,
       "equipped": false,
-      "slot": 0
+      "slot": 0,
+      "backpackSlot": 0
     },
     "plate": {
       "description": "",
       "armor": 1,
       "equipped": false,
-      "slot": 0
+      "slot": 0,
+      "backpackSlot": 0
     },
     "helm": {
       "description": "",
       "armor": 1,
       "equipped": false,
-      "slot": 0
+      "slot": 0,
+      "backpackSlot": 0
     },
     "shield": {
       "description": "",
       "armor": 1,
       "damage": "d4",
       "equipped": false,
-      "slot": 0
+      "slot": 0,
+      "backpackSlot": 0
     },
     "misc": {
       "description": "",
@@ -145,13 +150,15 @@
         "min": 1,
         "max": null,
         "value": 1
-      }
+      },
+      "backpackSlot": 0
     },
     "scar": {
       "description": ""
     },
     "fatigue": {
-      "description": ""
+      "description": "",
+      "backpackSlot": 0
     },
     "knight": {
       "name": "",

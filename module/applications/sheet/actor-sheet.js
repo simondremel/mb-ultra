@@ -95,12 +95,6 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
    * @returns {{hand: Object[], upper: Object[], backpack: Object[]}}
    */
   #buildInventory(properties) {
-    const slots = (items, size) => {
-      const result = items.map((item, index) => ({ item, over: index >= size }));
-      while (result.length < size) result.push({ item: null, over: false });
-      return result;
-    };
-
     const bodySlots = (types, size) => {
       const { placed, overflow } = MBActorSheet.#placeEquipped(properties.filter((item) => item.system.equipped && types.includes(item.type)), size);
       return [
@@ -110,12 +104,62 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
     };
 
     const equipped = properties.filter((item) => item.system.equipped && item.system.isEquippable);
+    const backpack = MBActorSheet.#placeBackpack(properties.filter((item) => !equipped.includes(item)), config.backpackSlots);
+    this.#queueBackpackSave(backpack.updates);
     return {
       hand: bodySlots(config.handItemTypes, config.bodySlots.hand),
       upper: bodySlots(config.upperItemTypes, config.bodySlots.upper),
-      backpack: slots(properties.filter((item) => !equipped.includes(item)), config.backpackSlots)
+      backpack: backpack.cells
     };
   }
+
+  /**
+   * Places unequipped items in their remembered backpack slot (system.backpackSlot, 1-based).
+   * Items without a valid, unclaimed slot take the first free one, or overrun.
+   * @param {Object[]} items
+   * @param {Number} size
+   * @returns {{cells: Object[], updates: Object[]}} cells to render and slot assignments to persist
+   */
+  static #placeBackpack(items, size) {
+    const placed = new Array(size).fill(null);
+    const loose = [];
+    for (const item of items) {
+      const index = (item.system.backpackSlot ?? 0) - 1;
+      if (index >= 0 && index < size && !placed[index]) placed[index] = item;
+      else loose.push(item);
+    }
+    const overrun = [];
+    for (const item of loose) {
+      const free = placed.indexOf(null);
+      if (free >= 0) placed[free] = item;
+      else overrun.push(item);
+    }
+    const updates = placed
+      .map((item, index) => (item && item.system.backpackSlot !== index + 1 ? { _id: item._id ?? item.id, "system.backpackSlot": index + 1 } : null))
+      .filter(Boolean);
+    return {
+      cells: [...placed.map((item) => ({ item, over: false })), ...overrun.map((item) => ({ item, over: true }))],
+      updates
+    };
+  }
+
+  /**
+   * Persists backpack slot assignments after rendering, so items keep their slot.
+   * @param {Object[]} updates
+   */
+  #queueBackpackSave(updates) {
+    if (!updates.length || this.#savingBackpack || !this.actor.isOwner || this.actor.pack) return;
+    this.#savingBackpack = true;
+    setTimeout(async () => {
+      try {
+        await this.actor.updateEmbeddedDocuments("Item", updates);
+      } finally {
+        this.#savingBackpack = false;
+      }
+    }, 0);
+  }
+
+  #savingBackpack = false;
 
   /**
    * Number of body slots an item occupies: long weapons need both hands.

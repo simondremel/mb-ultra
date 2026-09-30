@@ -27,7 +27,7 @@
   {{#if item}}
       <div class="inventory-slot filled {{printIf (eq item.type 'fatigue') 'fatigue'}} {{printIf over 'over'}}" data-item-id="{{item._id}}"
         data-source="{{item.name}}" data-tooltip="{{item.system.enrichedDescription}}" data-tooltip-direction="UP">
-        <div class="slot-label">{{label}}</div>
+        <div class="slot-label">{{#if over}}{{localize "MB.Inventory.Overrun"}}{{else}}{{label}}{{/if}}</div>
         <div class="slot-name text-bold">
           {{item.name}}{{#if item.system.quantity}} ({{item.system.quantity.value}}{{#if item.system.quantity.max}}/{{item.system.quantity.max}}{{/if}}){{/if}}
         </div>
@@ -60,12 +60,12 @@
       </div>
   {{else if blocker}}
     <div class="inventory-slot blocked">
-      <div class="slot-label">{{label}}</div>
+      <div class="slot-label">{{#if over}}{{localize "MB.Inventory.Overrun"}}{{else}}{{label}}{{/if}}</div>
       <div class="slot-name text-bold">{{blocker.name}}</div>
     </div>
   {{else}}
     <div class="inventory-slot empty">
-      <div class="slot-label">{{label}}</div>
+      <div class="slot-label">{{#if over}}{{localize "MB.Inventory.Overrun"}}{{else}}{{label}}{{/if}}</div>
     </div>
   {{/if}}
 {{/inline}}

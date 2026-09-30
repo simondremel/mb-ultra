@@ -1,7 +1,7 @@
 /** @name CONFIG.MB */
 export const config = {};
 
-config.bodySlots = { hand: 2, upper: 2 };
+config.bodySlots = { hand: 2, upper: 3 };
 config.backpackSlots = 6;
 config.systemPath = "systems/mbultra/";
 config.coreRollTable = "mbultra.mythic-bastionland-core-rolltables";
