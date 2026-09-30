@@ -3,18 +3,18 @@
 
   <h3 class="inventory-heading">{{localize "MB.Inventory.Body"}}</h3>
   <div class="inventory-grid">
-    {{#each inventory.hand as |slot|}}
-      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over label=(localize "MB.Inventory.Hand")}}
+    {{#each inventory.hand as |slot idx|}}
+      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over zone="hand" index=idx label=(localize "MB.Inventory.Hand")}}
     {{/each}}
-    {{#each inventory.upper as |slot|}}
-      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over label=(localize "MB.Inventory.Upper")}}
+    {{#each inventory.upper as |slot idx|}}
+      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over zone="upper" index=idx label=(localize "MB.Inventory.Upper")}}
     {{/each}}
   </div>
 
   <h3 class="inventory-heading">{{localize "MB.Inventory.Backpack"}}</h3>
   <div class="inventory-grid">
-    {{#each inventory.backpack as |slot|}}
-      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over label=(localize "MB.Inventory.Backpack")}}
+    {{#each inventory.backpack as |slot idx|}}
+      {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over zone="backpack" index=idx label=(localize "MB.Inventory.Backpack")}}
     {{/each}}
   </div>
   <div class="inventory-buttons">
@@ -25,9 +25,10 @@
 
 {{#*inline "inventory-slot"}}
   {{#if item}}
-      <div class="inventory-slot filled {{printIf (eq item.type 'fatigue') 'fatigue'}} {{printIf over 'over'}}" data-item-id="{{item._id}}"
+      <div class="inventory-slot filled {{printIf (eq item.type 'fatigue') 'fatigue'}} {{printIf over 'over'}}" data-item-id="{{item._id}}" data-zone="{{zone}}" data-index="{{index}}" {{#if over}}data-over="true"{{/if}}
         data-source="{{item.name}}" data-tooltip="{{item.system.enrichedDescription}}" data-tooltip-direction="UP">
         <div class="slot-label">{{#if over}}{{localize "MB.Inventory.Overrun"}}{{else}}{{label}}{{/if}}</div>
+        <a class="slot-drag-handle" draggable="true" title="{{localize "MB.Inventory.Drag"}}"><i class="fas fa-grip-vertical"></i></a>
         <div class="slot-name text-bold">
           {{item.name}}{{#if item.system.quantity}} ({{item.system.quantity.value}}{{#if item.system.quantity.max}}/{{item.system.quantity.max}}{{/if}}){{/if}}
         </div>
@@ -59,12 +60,12 @@
         </div>
       </div>
   {{else if blocker}}
-    <div class="inventory-slot blocked">
+    <div class="inventory-slot blocked" data-item-id="{{blocker._id}}" data-zone="{{zone}}" data-index="{{index}}" {{#if over}}data-over="true"{{/if}}>
       <div class="slot-label">{{#if over}}{{localize "MB.Inventory.Overrun"}}{{else}}{{label}}{{/if}}</div>
       <div class="slot-name text-bold">{{blocker.name}}</div>
     </div>
   {{else}}
-    <div class="inventory-slot empty">
+    <div class="inventory-slot empty" data-zone="{{zone}}" data-index="{{index}}" {{#if over}}data-over="true"{{/if}}>
       <div class="slot-label">{{#if over}}{{localize "MB.Inventory.Overrun"}}{{else}}{{label}}{{/if}}</div>
     </div>
   {{/if}}

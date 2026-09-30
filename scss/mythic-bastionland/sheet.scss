@@ -139,6 +139,22 @@
           gap: 6px;
         }
 
+        .slot-drag-handle {
+          flex: 0 0 auto;
+          cursor: grab;
+          opacity: 0.6;
+          margin-right: -2px;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        &.drop-target {
+          outline: 2px solid var(--highlight-dark-color);
+          outline-offset: -1px;
+        }
+
         &.empty {
           border-style: dashed;
           background-color: transparent;

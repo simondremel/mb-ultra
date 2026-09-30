@@ -9,6 +9,7 @@ import { actorAttackAction } from "../../actions/actor-attack-action.js";
 import { actorRegenerateAction } from "../../actions/actor-regenerate-action.js";
 import { actorAddItemAction } from "../../actions/actor-add-item-action.js";
 import { actorAddFatigueAction } from "../../actions/actor-add-fatigue-action.js";
+import { findFreeSlot, placeBackpack, placeEquipped, planMove, slotWidth } from "../../utils/inventory.js";
 import { actorInlineRollAction } from "../../actions/actor-inline-roll-action.js";
 
 /**
@@ -96,7 +97,7 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
    */
   #buildInventory(properties) {
     const bodySlots = (types, size) => {
-      const { placed, overflow } = MBActorSheet.#placeEquipped(properties.filter((item) => item.system.equipped && types.includes(item.type)), size);
+      const { placed, overflow } = placeEquipped(properties.filter((item) => item.system.equipped && types.includes(item.type)), size);
       return [
         ...placed.map((cell) => (cell?.blocked ? { item: null, blocker: cell.blocked, over: false } : { item: cell, over: false })),
         ...overflow.map((item) => ({ item, over: true }))
@@ -104,42 +105,12 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
     };
 
     const equipped = properties.filter((item) => item.system.equipped && item.system.isEquippable);
-    const backpack = MBActorSheet.#placeBackpack(properties.filter((item) => !equipped.includes(item)), config.backpackSlots);
+    const backpack = placeBackpack(properties.filter((item) => !equipped.includes(item)), config.backpackSlots);
     this.#queueBackpackSave(backpack.updates);
     return {
       hand: bodySlots(config.handItemTypes, config.bodySlots.hand),
       upper: bodySlots(config.upperItemTypes, config.bodySlots.upper),
       backpack: backpack.cells
-    };
-  }
-
-  /**
-   * Places unequipped items in their remembered backpack slot (system.backpackSlot, 1-based).
-   * Items without a valid, unclaimed slot take the first free one, or overrun.
-   * @param {Object[]} items
-   * @param {Number} size
-   * @returns {{cells: Object[], updates: Object[]}} cells to render and slot assignments to persist
-   */
-  static #placeBackpack(items, size) {
-    const placed = new Array(size).fill(null);
-    const loose = [];
-    for (const item of items) {
-      const index = (item.system.backpackSlot ?? 0) - 1;
-      if (index >= 0 && index < size && !placed[index]) placed[index] = item;
-      else loose.push(item);
-    }
-    const overrun = [];
-    for (const item of loose) {
-      const free = placed.indexOf(null);
-      if (free >= 0) placed[free] = item;
-      else overrun.push(item);
-    }
-    const updates = placed
-      .map((item, index) => (item && item.system.backpackSlot !== index + 1 ? { _id: item._id ?? item.id, "system.backpackSlot": index + 1 } : null))
-      .filter(Boolean);
-    return {
-      cells: [...placed.map((item) => ({ item, over: false })), ...overrun.map((item) => ({ item, over: true }))],
-      updates
     };
   }
 
@@ -160,60 +131,6 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   #savingBackpack = false;
-
-  /**
-   * Number of body slots an item occupies: long weapons need both hands.
-   * @param {Object} item
-   * @returns {Number}
-   */
-  static #slotWidth(item) {
-    return item.type === config.itemTypes.weapon && item.system.long ? 2 : 1;
-  }
-
-  /**
-   * Finds the first index where `width` consecutive slots are free.
-   * @param {(Object|null)[]} placed
-   * @param {Number} width
-   * @returns {Number} -1 when there is no room
-   */
-  static #findFreeSlot(placed, width) {
-    for (let index = 0; index + width <= placed.length; index++) {
-      if (placed.slice(index, index + width).every((cell) => cell === null)) return index;
-    }
-    return -1;
-  }
-
-  /**
-   * Places equipped items in their remembered body slot (system.slot, 1-based).
-   * Items without a valid, unclaimed slot take the first free one, or overflow.
-   * Extra slots taken by a wide item hold a `{ blocked: item }` marker.
-   * @param {Object[]} items equipped items of one slot group
-   * @param {Number} size
-   * @returns {{placed: (Object|null)[], overflow: Object[]}}
-   */
-  static #placeEquipped(items, size) {
-    const placed = new Array(size).fill(null);
-    const loose = [];
-    const put = (item, index) => {
-      placed[index] = item;
-      for (let extra = 1; extra < MBActorSheet.#slotWidth(item); extra++) placed[index + extra] = { blocked: item };
-    };
-
-    const widestFirst = [...items].sort((a, b) => MBActorSheet.#slotWidth(b) - MBActorSheet.#slotWidth(a));
-    for (const item of widestFirst) {
-      const index = (item.system.slot ?? 0) - 1;
-      const width = MBActorSheet.#slotWidth(item);
-      if (index >= 0 && index + width <= size && placed.slice(index, index + width).every((cell) => cell === null)) put(item, index);
-      else loose.push(item);
-    }
-    const overflow = [];
-    for (const item of loose) {
-      const free = MBActorSheet.#findFreeSlot(placed, MBActorSheet.#slotWidth(item));
-      if (free >= 0) put(item, free);
-      else overflow.push(item);
-    }
-    return { placed, overflow };
-  }
 
   async #prepareActors(data) {
     const actors = [];
@@ -273,6 +190,8 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     if (!this.options.editable) return;
 
+    this.#activateInventoryDragDrop(html);
+
     this.#bindSelectorsEvent("click", {
       ".item-toggle-equipped": this.#onToggleEquipped,
       ".item-edit": this.#onItemEdit,
@@ -292,6 +211,61 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
       ".button-attack": event => this.#invokeAction(event, actorAttackAction, this.actor),
       ".inline-roll": event => this.#invokeAction(event, actorInlineRollAction, this.#getActor(event) ?? this.actor, this.#getOnlineRollData(event))
     });
+  }
+
+  #dragItemId = null;
+
+  /**
+   * Drag handles pick up items, inventory slots accept drops (overrun slots excluded).
+   * @param {JQuery.<HTMLElement>} html
+   */
+  #activateInventoryDragDrop(html) {
+    html.find(".slot-drag-handle").on("dragstart", (event) => {
+      const slot = event.currentTarget.closest(".inventory-slot");
+      this.#dragItemId = slot.dataset.itemId;
+      const dataTransfer = event.originalEvent.dataTransfer;
+      dataTransfer.effectAllowed = "move";
+      dataTransfer.setData("text/plain", JSON.stringify({ type: "MBInventoryMove", itemId: this.#dragItemId }));
+      dataTransfer.setDragImage(slot, 10, 10);
+    }).on("dragend", () => {
+      this.#dragItemId = null;
+      html.find(".drop-target").removeClass("drop-target");
+    });
+
+    html.find(".inventory-slot:not([data-over])").on("dragover", (event) => {
+      if (!this.#dragItemId) return;
+      event.preventDefault();
+      event.originalEvent.dataTransfer.dropEffect = "move";
+      event.currentTarget.classList.add("drop-target");
+    }).on("dragleave", (event) => {
+      event.currentTarget.classList.remove("drop-target");
+    }).on("drop", (event) => this.#onInventoryDrop(event));
+  }
+
+  /**
+   * @param {DragEvent} event
+   */
+  async #onInventoryDrop(event) {
+    if (!this.#dragItemId) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const slot = event.currentTarget;
+    const itemId = this.#dragItemId;
+    this.#dragItemId = null;
+    this.element.find(".drop-target").removeClass("drop-target");
+
+    const result = planMove(this.actor.items.contents, itemId, { zone: slot.dataset.zone, index: Number(slot.dataset.index) });
+    if (result.error) {
+      const { key, args } = result.error;
+      ui.notifications.warn(game.i18n.format(`MB.Inventory.${key}`, {
+        name: args.name,
+        slot: args.group ? game.i18n.localize(args.group === "hand" ? "MB.Inventory.Hand" : "MB.Inventory.Upper") : "",
+        type: args.type ? game.i18n.localize(`TYPES.Item.${args.type}`).toLowerCase() : ""
+      }));
+      return;
+    }
+    if (result.updates.length) await this.actor.updateEmbeddedDocuments("Item", result.updates);
   }
 
   /**
@@ -400,7 +374,7 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
     const types = isHand ? config.handItemTypes : config.upperItemTypes;
     const size = isHand ? config.bodySlots.hand : config.bodySlots.upper;
     const equipped = this.actor.items.filter((i) => i.system.equipped && types.includes(i.type));
-    const { placed } = MBActorSheet.#placeEquipped(equipped, size);
+    const { placed } = placeEquipped(equipped, size);
 
     // Remember the current slot of every equipped item so nothing shifts when this one changes.
     const updates = placed
@@ -415,9 +389,9 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
         ui.notifications.warn(game.i18n.format("MB.Inventory.AlreadyWorn", { type: game.i18n.localize(`TYPES.Item.${item.type}`).toLowerCase() }));
         return;
       }
-      const free = MBActorSheet.#findFreeSlot(placed, MBActorSheet.#slotWidth(item));
+      const free = findFreeSlot(placed, slotWidth(item));
       if (free < 0) {
-        const message = MBActorSheet.#slotWidth(item) > 1
+        const message = slotWidth(item) > 1
           ? game.i18n.format("MB.Inventory.NeedsBothHands", { name: item.name })
           : game.i18n.format("MB.Inventory.SlotsFull", { slot: game.i18n.localize(isHand ? "MB.Inventory.Hand" : "MB.Inventory.Upper") });
         ui.notifications.warn(message);

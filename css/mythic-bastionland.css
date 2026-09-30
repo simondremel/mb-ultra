@@ -805,6 +805,19 @@
   display: flex;
   gap: 6px;
 }
+.mythic-bastionland.sheet .inventory .inventory-slot .slot-drag-handle {
+  flex: 0 0 auto;
+  cursor: grab;
+  opacity: 0.6;
+  margin-right: -2px;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot .slot-drag-handle:hover {
+  opacity: 1;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot.drop-target {
+  outline: 2px solid var(--highlight-dark-color);
+  outline-offset: -1px;
+}
 .mythic-bastionland.sheet .inventory .inventory-slot.empty {
   border-style: dashed;
   background-color: transparent;
