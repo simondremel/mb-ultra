@@ -1,0 +1,60 @@
+<div class="inventory">
+  <h2 class="text-large">{{localize "MB.Actor.Property"}}</h2>
+
+  <h3 class="inventory-heading">{{localize "MB.Inventory.Body"}}</h3>
+  <div class="inventory-grid">
+    {{#each inventory.hand as |slot|}}
+      {{> inventory-slot item=slot.item over=slot.over label=(localize "MB.Inventory.Hand")}}
+    {{/each}}
+    {{#each inventory.upper as |slot|}}
+      {{> inventory-slot item=slot.item over=slot.over label=(localize "MB.Inventory.Upper")}}
+    {{/each}}
+  </div>
+
+  <h3 class="inventory-heading">{{localize "MB.Inventory.Backpack"}}</h3>
+  <div class="inventory-grid">
+    {{#each inventory.backpack as |slot|}}
+      {{> inventory-slot item=slot.item over=slot.over label=(localize "MB.Inventory.Backpack")}}
+    {{/each}}
+  </div>
+</div>
+
+{{#*inline "inventory-slot"}}
+  {{#if item}}
+      <div class="inventory-slot filled {{printIf over 'over'}}" data-item-id="{{item._id}}"
+        data-source="{{item.name}}" data-tooltip="{{item.system.enrichedDescription}}" data-tooltip-direction="UP">
+        <div class="slot-label">{{label}}</div>
+        <div class="slot-name text-bold">
+          {{item.name}}{{#if item.system.quantity}} ({{item.system.quantity.value}}{{#if item.system.quantity.max}}/{{item.system.quantity.max}}{{/if}}){{/if}}
+        </div>
+        <div class="slot-stats">
+          {{#if (or (eq item.type 'weapon') (eq item.type 'shield'))}}
+            <a class="inline-roll roll" data-mode="roll" data-flavor="damage" data-formula="{{item.system.damage}}"><i
+                class="fas fa-dice-d20"></i>{{item.system.damage}}</a>
+          {{/if}}
+          {{#if item.system.armor}}A{{item.system.armor}}{{/if}}
+          {{#if (eq item.type 'weapon')}}<span class="text-lowercase">{{#if item.system.hefty}}, {{localize "MB.Item.Hefty"}}{{/if}}{{#if item.system.long}}, {{localize "MB.Item.Long"}}{{/if}}{{#if item.system.slow}}, {{localize "MB.Item.Slow"}}{{/if}}</span>{{/if}}
+        </div>
+        <div class="slot-actions">
+          {{#if (eq item.type 'misc')}}
+            {{#if item.system.quantity}}
+              <a class="item-action item-qty-plus" title="Add Quantity"><i class="fas fa-plus"></i></a>
+              <a class="item-action item-qty-minus" title="Subtract Quantity"><i class="fas fa-minus"></i></a>
+            {{/if}}
+          {{/if}}
+          {{#if item.system.isEquippable}}
+            <a class="item-action item-toggle-equipped {{printIf item.system.equipped 'equipped'}}"
+              title="{{printIfElse item.system.equipped (localize "MB.Item.Unequip") (localize "MB.Item.Equip")}}">
+              <i class="fas fa-fist-raised {{printIf item.system.equipped 'highlight'}}"></i>
+            </a>
+          {{/if}}
+          <a class="item-action item-edit" title="{{localize "MB.Item.Edit"}}"><i class="fas fa-edit"></i></a>
+          <a class="item-action item-delete" title="{{localize "MB.Item.Delete"}}"><i class="fas fa-trash"></i></a>
+        </div>
+      </div>
+  {{else}}
+    <div class="inventory-slot empty">
+      <div class="slot-label">{{label}}</div>
+    </div>
+  {{/if}}
+{{/inline}}

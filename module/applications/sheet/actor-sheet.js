@@ -79,11 +79,33 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
     data.data.passions = data.data.items.filter((item) => item.type === config.itemTypes.passion);
     data.data.scars = data.data.items.filter((item) => item.type === config.itemTypes.scar);
     data.data.properties = data.data.items.filter((item) => ([config.itemTypes.weapon, config.itemTypes.coat, config.itemTypes.plate, config.itemTypes.helm, config.itemTypes.shield, config.itemTypes.misc].includes(item.type)));
+    data.data.inventory = this.#buildInventory(data.data.properties);
     data.data.totalArmor = data.data.items.reduce((totalArmor, item) => {
       return totalArmor + (item.system.equipped ? (item.system.armor ?? 0) : 0);
     }, 0);
 
     return data;
+  }
+
+  /**
+   * Distributes property items over the fixed body and backpack slots.
+   * Slots beyond the fixed amount are flagged as overflow.
+   * @param {Object[]} properties
+   * @returns {{hand: Object[], upper: Object[], backpack: Object[]}}
+   */
+  #buildInventory(properties) {
+    const slots = (items, size) => {
+      const result = items.map((item, index) => ({ item, over: index >= size }));
+      while (result.length < size) result.push({ item: null, over: false });
+      return result;
+    };
+
+    const equipped = properties.filter((item) => item.system.equipped && item.system.isEquippable);
+    return {
+      hand: slots(equipped.filter((item) => config.handItemTypes.includes(item.type)), config.bodySlots.hand),
+      upper: slots(equipped.filter((item) => config.upperItemTypes.includes(item.type)), config.bodySlots.upper),
+      backpack: slots(properties.filter((item) => !equipped.includes(item)), config.backpackSlots)
+    };
   }
 
   async #prepareActors(data) {
@@ -266,6 +288,16 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
    */
   async #onToggleEquipped(event) {
     const item = this.#getItem(event);
+    if (!item.system.equipped) {
+      const slotTypes = config.handItemTypes.includes(item.type) ? config.handItemTypes : config.upperItemTypes;
+      const slotCount = config.handItemTypes.includes(item.type) ? config.bodySlots.hand : config.bodySlots.upper;
+      const used = this.actor.items.filter((i) => i.system.equipped && slotTypes.includes(i.type)).length;
+      if (used >= slotCount) {
+        const slotName = game.i18n.localize(config.handItemTypes.includes(item.type) ? "MB.Inventory.Hand" : "MB.Inventory.Upper");
+        ui.notifications.warn(game.i18n.format("MB.Inventory.SlotsFull", { slot: slotName }));
+        return;
+      }
+    }
     await item.update({ "system.equipped": !item.system.equipped });
   }
 

@@ -42,6 +42,7 @@ export const configureHandlebar = () => {
 
   loadTemplates({
     "item-list": `${config.systemPath}/templates/applications/sheet/actor/common/item-list.hbs`,
+    "inventory": `${config.systemPath}/templates/applications/sheet/actor/common/inventory.hbs`,
     "actor-list": `${config.systemPath}/templates/applications/sheet/actor/common/actor-list.hbs`,
     "virtues": `${config.systemPath}/templates/applications/sheet/actor/common/virtues.hbs`,
     "actions": `${config.systemPath}/templates/applications/sheet/actor/common/actions.hbs`

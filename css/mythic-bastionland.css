@@ -747,3 +747,57 @@
 .mythic-bastionland.chat-message .message-content .outcome .chat-message-button:disabled {
   cursor: not-allowed;
 }
+
+.mythic-bastionland.sheet .inventory .inventory-heading {
+  margin: 4px 0;
+  font-family: var(--secondary-text-font-family);
+  font-size: 18px;
+  color: var(--text-dark-color);
+  border: none;
+}
+.mythic-bastionland.sheet .inventory .inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot {
+  position: relative;
+  min-height: 72px;
+  padding: 4px 6px 22px;
+  border: 1px solid var(--secondary-color);
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.05);
+  font-size: 13px;
+  line-height: 1.2;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot .slot-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.6;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot.empty {
+  border-style: dashed;
+  background-color: transparent;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot.over {
+  background-color: rgba(190, 30, 30, 0.35);
+  border-color: #8a1c1c;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot.empty.over {
+  background-color: rgba(190, 30, 30, 0.2);
+}
+.mythic-bastionland.sheet .inventory .inventory-slot .slot-stats {
+  margin-top: 2px;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot .slot-actions {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  display: flex;
+  gap: 6px;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot i.fas {
+  font-size: 12px;
+}

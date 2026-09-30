@@ -1,6 +1,8 @@
 /** @name CONFIG.MB */
 export const config = {};
 
+config.bodySlots = { hand: 2, upper: 2 };
+config.backpackSlots = 6;
 config.systemPath = "systems/mbultra/";
 config.coreRollTable = "mbultra.mythic-bastionland-core-rolltables";
 config.coreItems = "mbultra.mythic-bastionland-core-items";
@@ -27,6 +29,9 @@ config.itemTypes = {
   scar: "scar",
   knight: "knight"
 };
+
+config.handItemTypes = [config.itemTypes.weapon, config.itemTypes.shield];
+config.upperItemTypes = [config.itemTypes.coat, config.itemTypes.plate, config.itemTypes.helm];
 
 config.rank = {
   "knight_errant": "knight_errant",
