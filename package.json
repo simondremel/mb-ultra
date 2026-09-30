@@ -2,7 +2,7 @@
   "name": "mythic-bastionland-foundry-vtt",
   "version": "1.0.0",
   "description": "FoundryVTT system for the Mythic Bastionland TTPRG",
-  "main": "./module/mythicbastionland.js",
+  "main": "./module/mbultra.js",
   "scripts": {
     "build:css": "gulp buildCSS",
     "build:watch": "gulp",

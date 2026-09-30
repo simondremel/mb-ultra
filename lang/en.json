@@ -21,6 +21,7 @@
   "MB.Actor.FocusLine3": "Pass a <a class='inline-roll roll' data-mode='roll' data-flavor='clarity' data-fatigue=true><i class='fas fa-dice-d20'></i>CLA Save</a> or become Fatigued",
   "MB.Actor.Gambit": "Gambit",
   "MB.Actor.Glory": "Glory",
+  "MB.Actor.Coinage": "Coinage",
   "MB.Actor.GreaterEffect": "<strong>Greater Effect</strong> such as disarming an item, breaking a wooden shield or weapon, or removing a helm. This does not increase the damage from Bolster.",
   "MB.Actor.Guard": "Guard",
   "MB.Actor.GuardAbr": "gd",

@@ -1,4 +1,4 @@
-const path = "/systems/mythicbastionland/module/data/compendium";
+const path = "/systems/mbultra/module/data/compendium";
 
 export const processAll = async () => {
   await processItems();

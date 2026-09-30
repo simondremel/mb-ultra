@@ -40,7 +40,7 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
   _getHeaderButtons() {
     const additionalButtons = [];
     if ([config.actorTypes.knight, config.actorTypes.npc, config.actorTypes.squire, config.actorTypes.warband].includes(this.actor.type)) {
-      if (game.user.isGM || (game.settings.get("mythicbastionland", "MB.AllowPlayerRegenerateButton"))) {
+      if (game.user.isGM || (game.settings.get("mbultra", "MB.AllowPlayerRegenerateButton"))) {
         additionalButtons.push({
           class: `regenerate-button-${this.actor.id}`,
           label: game.i18n.localize("MB.Regenerate"),
@@ -278,6 +278,7 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
   async _onSubmit(event, { updateData = null, preventClose = false } = {}) {
     const fields = [
       "system.glory",
+      "system.coinage",
       "system.guard.value", "system.guard.max",
       "system.virtues.vigour.value", "system.virtues.vigour.max",
       "system.virtues.clarity.value", "system.virtues.clarity.max",

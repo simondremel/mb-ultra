@@ -1,10 +1,10 @@
 /** @name CONFIG.MB */
 export const config = {};
 
-config.systemPath = "systems/mythicbastionland/";
-config.coreRollTable = "mythicbastionland.mythic-bastionland-core-rolltables";
-config.coreItems = "mythicbastionland.mythic-bastionland-core-items";
-config.coreActors = "mythicbastionland.mythic-bastionland-core-actors";
+config.systemPath = "systems/mbultra/";
+config.coreRollTable = "mbultra.mythic-bastionland-core-rolltables";
+config.coreItems = "mbultra.mythic-bastionland-core-items";
+config.coreActors = "mbultra.mythic-bastionland-core-actors";
 
 config.actorTypes = {
   knight: "knight",

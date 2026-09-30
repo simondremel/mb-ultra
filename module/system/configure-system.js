@@ -21,7 +21,7 @@ export const configureSystem = () => {
     label: "MB.SheetItem"
   });
 
-  game.settings.register("mythicbastionland", "MB.AllowPlayerRegenerateButton", {
+  game.settings.register("mbultra", "MB.AllowPlayerRegenerateButton", {
     name: game.i18n.localize("MB.AllowPlayerRegenerateButtonSettingName"),
     hint: game.i18n.localize("MB.AllowPlayerRegenerateButtonSettingHint"),
     scope: "world",
@@ -31,7 +31,7 @@ export const configureSystem = () => {
     default: true
   });
 
-  game.settings.register("mythicbastionland", "MB.CombatEncounterMessages", {
+  game.settings.register("mbultra", "MB.CombatEncounterMessages", {
     name: game.i18n.localize("MB.CombatEncounterSettingName"),
     hint: game.i18n.localize("MB.CombatEncounterSettingHint"),
     scope: "world",

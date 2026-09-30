@@ -50,7 +50,8 @@
       "glory": {
         "min": 0,
         "value": 0
-      }
+      },
+      "coinage": 0
     },
     "npc": {
       "templates": [
@@ -61,7 +62,8 @@
     "squire": {
       "templates": [
         "common"
-      ]
+      ],
+      "coinage": 0
     },
     "creature": {
       "templates": [
