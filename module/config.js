@@ -27,6 +27,7 @@ config.itemTypes = {
   passion: "passion",
   misc: "misc",
   scar: "scar",
+  fatigue: "fatigue",
   knight: "knight"
 };
 
@@ -124,6 +125,9 @@ config.itemDefaults = {
   },
   [config.itemTypes.weapon]: {
     img: `${config.systemPath}tokens/items/weapon.png`
+  },
+  [config.itemTypes.fatigue]: {
+    img: `${config.systemPath}tokens/items/misc.png`
   },
   [config.itemTypes.knight]: {
     img: `${config.systemPath}tokens/items/knight.png`

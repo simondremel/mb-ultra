@@ -8,6 +8,7 @@ import { attackVirtueLossAction } from "../../actions/actor-virtue-loss-action.j
 import { actorAttackAction } from "../../actions/actor-attack-action.js";
 import { actorRegenerateAction } from "../../actions/actor-regenerate-action.js";
 import { actorAddItemAction } from "../../actions/actor-add-item-action.js";
+import { actorAddFatigueAction } from "../../actions/actor-add-fatigue-action.js";
 import { actorInlineRollAction } from "../../actions/actor-inline-roll-action.js";
 
 /**
@@ -67,7 +68,7 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async #prepareItems(data) {
-    const itemTypeOrders = { weapon: 1, shield: 2, plate: 3, coat: 4, helm: 5, misc: 6, passion: 7, ability: 7, scar: 7 };
+    const itemTypeOrders = { weapon: 1, shield: 2, plate: 3, coat: 4, helm: 5, misc: 6, fatigue: 6.5, passion: 7, ability: 7, scar: 7 };
     data.data.items = data.data.items.sort((a, b) => itemTypeOrders[a.type] - itemTypeOrders[b.type] || a.name.localeCompare(b.name));
 
     for (const item of data.data.items) {
@@ -78,7 +79,7 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
     data.data.abilities = data.data.items.filter((item) => item.type === config.itemTypes.ability);
     data.data.passions = data.data.items.filter((item) => item.type === config.itemTypes.passion);
     data.data.scars = data.data.items.filter((item) => item.type === config.itemTypes.scar);
-    data.data.properties = data.data.items.filter((item) => ([config.itemTypes.weapon, config.itemTypes.coat, config.itemTypes.plate, config.itemTypes.helm, config.itemTypes.shield, config.itemTypes.misc].includes(item.type)));
+    data.data.properties = data.data.items.filter((item) => ([config.itemTypes.weapon, config.itemTypes.coat, config.itemTypes.plate, config.itemTypes.helm, config.itemTypes.shield, config.itemTypes.misc, config.itemTypes.fatigue].includes(item.type)));
     data.data.inventory = this.#buildInventory(data.data.properties);
     data.data.totalArmor = data.data.items.reduce((totalArmor, item) => {
       return totalArmor + (item.system.equipped ? (item.system.armor ?? 0) : 0);
@@ -237,6 +238,7 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
       ".item-qty-plus": this.#onItemAddQuantity,
       ".item-qty-minus": this.#onItemSubtractQuantity,
       ".roll-save": event => this.#invokeAction(event, actorSaveAction, this.actor, { virtue: this.#getEventData(event, "virtue") }),
+      ".button-add-fatigue": event => this.#invokeAction(event, actorAddFatigueAction, this.actor),
       ".button-add-item": event => this.#invokeAction(event, actorAddItemAction, this.actor),
       ".button-rest": event => this.#invokeAction(event, actorRestAction, this.actor),
       ".button-roll-scars": event => this.#invokeAction(event, actorRollScarsAction, this.actor),

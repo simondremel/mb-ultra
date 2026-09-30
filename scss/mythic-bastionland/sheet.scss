@@ -134,6 +134,17 @@
           background-color: transparent;
         }
 
+        &.fatigue {
+          background-color: #000;
+          border-color: #000;
+          color: #fff;
+
+          a.item-action,
+          .slot-label {
+            color: #fff;
+          }
+        }
+
         &.blocked {
           background-color: rgba(0, 0, 0, 0.08);
           border-style: dashed;

@@ -801,6 +801,15 @@
   border-style: dashed;
   background-color: transparent;
 }
+.mythic-bastionland.sheet .inventory .inventory-slot.fatigue {
+  background-color: #000;
+  border-color: #000;
+  color: #fff;
+}
+.mythic-bastionland.sheet .inventory .inventory-slot.fatigue a.item-action,
+.mythic-bastionland.sheet .inventory .inventory-slot.fatigue .slot-label {
+  color: #fff;
+}
 .mythic-bastionland.sheet .inventory .inventory-slot.blocked {
   background-color: rgba(0, 0, 0, 0.08);
   border-style: dashed;

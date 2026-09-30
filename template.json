@@ -93,7 +93,8 @@
       "passion",
       "misc",
       "scar",
-      "knight"
+      "knight",
+      "fatigue"
     ],
     "htmlFields": [
       "description"
@@ -147,6 +148,9 @@
       }
     },
     "scar": {
+      "description": ""
+    },
+    "fatigue": {
       "description": ""
     },
     "knight": {
