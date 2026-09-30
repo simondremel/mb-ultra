@@ -208,6 +208,7 @@
   "MB.Hostile": "Hostile",
   "MB.Impaired": "Impaired",
   "MB.ImpairedMessage": "Your attacks are Impaired",
+  "MB.Inventory.AlreadyWorn": "You are already wearing a {type}. Unequip it first.",
   "MB.Inventory.Backpack": "Backpack",
   "MB.Inventory.Body": "Body",
   "MB.Inventory.Hand": "Hand",

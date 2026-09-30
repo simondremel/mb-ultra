@@ -365,6 +365,10 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
     if (item.system.equipped) {
       updates.push({ _id: item.id, "system.equipped": false, "system.slot": 0 });
     } else {
+      if (config.upperItemTypes.includes(item.type) && equipped.some((i) => i.type === item.type)) {
+        ui.notifications.warn(game.i18n.format("MB.Inventory.AlreadyWorn", { type: game.i18n.localize(`TYPES.Item.${item.type}`).toLowerCase() }));
+        return;
+      }
       const free = MBActorSheet.#findFreeSlot(placed, MBActorSheet.#slotWidth(item));
       if (free < 0) {
         const message = MBActorSheet.#slotWidth(item) > 1
