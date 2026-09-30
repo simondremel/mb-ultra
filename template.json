@@ -110,28 +110,33 @@
       "hefty": false,
       "long": false,
       "slow": false,
-      "equipped": false
+      "equipped": false,
+      "slot": 0
     },
     "coat": {
       "description": "",
       "armor": 1,
-      "equipped": false
+      "equipped": false,
+      "slot": 0
     },
     "plate": {
       "description": "",
       "armor": 1,
-      "equipped": false
+      "equipped": false,
+      "slot": 0
     },
     "helm": {
       "description": "",
       "armor": 1,
-      "equipped": false
+      "equipped": false,
+      "slot": 0
     },
     "shield": {
       "description": "",
       "armor": 1,
       "damage": "d4",
-      "equipped": false
+      "equipped": false,
+      "slot": 0
     },
     "misc": {
       "description": "",

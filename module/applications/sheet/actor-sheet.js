@@ -100,12 +100,41 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
       return result;
     };
 
+    const bodySlots = (types, size) => {
+      const { placed, overflow } = MBActorSheet.#placeEquipped(properties.filter((item) => item.system.equipped && types.includes(item.type)), size);
+      return [...placed.map((item) => ({ item, over: false })), ...overflow.map((item) => ({ item, over: true }))];
+    };
+
     const equipped = properties.filter((item) => item.system.equipped && item.system.isEquippable);
     return {
-      hand: slots(equipped.filter((item) => config.handItemTypes.includes(item.type)), config.bodySlots.hand),
-      upper: slots(equipped.filter((item) => config.upperItemTypes.includes(item.type)), config.bodySlots.upper),
+      hand: bodySlots(config.handItemTypes, config.bodySlots.hand),
+      upper: bodySlots(config.upperItemTypes, config.bodySlots.upper),
       backpack: slots(properties.filter((item) => !equipped.includes(item)), config.backpackSlots)
     };
+  }
+
+  /**
+   * Places equipped items in their remembered body slot (system.slot, 1-based).
+   * Items without a valid, unclaimed slot take the first free one, or overflow.
+   * @param {Object[]} items equipped items of one slot group
+   * @param {Number} size
+   * @returns {{placed: (Object|null)[], overflow: Object[]}}
+   */
+  static #placeEquipped(items, size) {
+    const placed = new Array(size).fill(null);
+    const loose = [];
+    for (const item of items) {
+      const index = (item.system.slot ?? 0) - 1;
+      if (index >= 0 && index < size && !placed[index]) placed[index] = item;
+      else loose.push(item);
+    }
+    const overflow = [];
+    for (const item of loose) {
+      const free = placed.indexOf(null);
+      if (free >= 0) placed[free] = item;
+      else overflow.push(item);
+    }
+    return { placed, overflow };
   }
 
   async #prepareActors(data) {
@@ -288,17 +317,29 @@ export class MBActorSheet extends foundry.appv1.sheets.ActorSheet {
    */
   async #onToggleEquipped(event) {
     const item = this.#getItem(event);
-    if (!item.system.equipped) {
-      const slotTypes = config.handItemTypes.includes(item.type) ? config.handItemTypes : config.upperItemTypes;
-      const slotCount = config.handItemTypes.includes(item.type) ? config.bodySlots.hand : config.bodySlots.upper;
-      const used = this.actor.items.filter((i) => i.system.equipped && slotTypes.includes(i.type)).length;
-      if (used >= slotCount) {
-        const slotName = game.i18n.localize(config.handItemTypes.includes(item.type) ? "MB.Inventory.Hand" : "MB.Inventory.Upper");
-        ui.notifications.warn(game.i18n.format("MB.Inventory.SlotsFull", { slot: slotName }));
+    const isHand = config.handItemTypes.includes(item.type);
+    const types = isHand ? config.handItemTypes : config.upperItemTypes;
+    const size = isHand ? config.bodySlots.hand : config.bodySlots.upper;
+    const equipped = this.actor.items.filter((i) => i.system.equipped && types.includes(i.type));
+    const { placed } = MBActorSheet.#placeEquipped(equipped, size);
+
+    // Remember the current slot of every equipped item so nothing shifts when this one changes.
+    const updates = placed
+      .map((placedItem, index) => (placedItem && placedItem.system.slot !== index + 1 && placedItem !== item
+        ? { _id: placedItem.id, "system.slot": index + 1 } : null))
+      .filter(Boolean);
+
+    if (item.system.equipped) {
+      updates.push({ _id: item.id, "system.equipped": false, "system.slot": 0 });
+    } else {
+      const free = placed.indexOf(null);
+      if (free < 0) {
+        ui.notifications.warn(game.i18n.format("MB.Inventory.SlotsFull", { slot: game.i18n.localize(isHand ? "MB.Inventory.Hand" : "MB.Inventory.Upper") }));
         return;
       }
+      updates.push({ _id: item.id, "system.equipped": true, "system.slot": free + 1 });
     }
-    await item.update({ "system.equipped": !item.system.equipped });
+    await this.actor.updateEmbeddedDocuments("Item", updates);
   }
 
   /**
