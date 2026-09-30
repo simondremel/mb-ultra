@@ -17,7 +17,10 @@
       {{> inventory-slot item=slot.item blocker=slot.blocker over=slot.over label=(localize "MB.Inventory.Backpack")}}
     {{/each}}
   </div>
-  <button type="button" class="button-primary button-add-fatigue">{{localize "MB.Inventory.AddFatigue"}}</button>
+  <div class="inventory-buttons">
+    <button type="button" class="button-primary button-add-fatigue">{{localize "MB.Inventory.AddFatigue"}}</button>
+    <button type="button" class="button-primary button-add-item">{{localize "MB.AddItem"}}</button>
+  </div>
 </div>
 
 {{#*inline "inventory-slot"}}

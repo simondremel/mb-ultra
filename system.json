@@ -2,14 +2,14 @@
   "id": "mbultra",
   "title": "MB Ultra",
   "description": "MB Ultra: a fork of the Mythic Bastionland system with extra features such as Coinage. Installs alongside the original.",
-  "version": "1.0.8-ultra.7",
+  "version": "1.0.8-ultra.8",
   "compatibility": {
     "minimum": "13",
     "verified": "13.348"
   },
   "url": "https://github.com/simondremel/mb-ultra",
   "manifest": "https://github.com/simondremel/mb-ultra/releases/latest/download/system.json",
-  "download": "https://github.com/simondremel/mb-ultra/releases/download/1.0.8-ultra.7/system.zip",
+  "download": "https://github.com/simondremel/mb-ultra/releases/download/1.0.8-ultra.8/system.zip",
   "authors": [
     {
       "name": "Loner",

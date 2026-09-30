@@ -755,6 +755,14 @@
   color: var(--text-dark-color);
   border: none;
 }
+.mythic-bastionland.sheet .inventory .inventory-buttons {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.mythic-bastionland.sheet .inventory .inventory-buttons button {
+  width: auto;
+}
 .mythic-bastionland.sheet .inventory .inventory-grid {
   display: flex;
   flex-direction: column;

@@ -82,6 +82,16 @@
         border: none;
       }
 
+      .inventory-buttons {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 8px;
+
+        button {
+          width: auto;
+        }
+      }
+
       .inventory-grid {
         display: flex;
         flex-direction: column;
