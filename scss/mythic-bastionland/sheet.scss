@@ -110,7 +110,7 @@
         }
 
         .slot-name {
-          flex: 1 1 auto;
+          flex: 0 1 auto;
           min-width: 0;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -124,6 +124,7 @@
 
         .slot-actions {
           flex: 0 0 auto;
+          margin-left: auto;
           display: flex;
           gap: 6px;
         }
